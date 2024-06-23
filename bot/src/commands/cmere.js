@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { joinVoiceChannel } = require('@discordjs/voice');
+const SM = require('../sound-manager.js')
 
 module.exports = {
 	data:
@@ -9,10 +10,6 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.reply('on it boss');
 		const channel = interaction.member.voice.channel;
-		joinVoiceChannel({
-			channelId: channel.id,
-			guildId: channel.guild.id,
-			adapterCreator: channel.guild.voiceAdapterCreator
-		})
+		SM.connect(channel);
 	}
 }

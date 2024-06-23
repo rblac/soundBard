@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { getVoiceConnection } = require('@discordjs/voice')
+const SM = require('../sound-manager.js')
 
 module.exports = {
 	data:
@@ -7,9 +8,7 @@ module.exports = {
 			.setName("bye")
 			.setDescription("Make the bot exit the channel."),
 	async execute(interaction) {
-		await interaction.reply('baii ^-^')
-		const channel = interaction.member.voice.channel;
-		const conn = getVoiceConnection(channel.guild.id)
-		conn.destroy()
+		if(SM.disconnect()) await interaction.reply('baii ^-^')
+		else await interaction.reply(':face_with_raised_eyebrow: :face_with_raised_eyebrow: :face_with_raised_eyebrow:')
 	}
 }
