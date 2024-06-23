@@ -9,7 +9,7 @@ const path = require('node:path');
 const loadCommands = require('./commands.js').loadCommands
 
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
 
 // Init commands
 	client.commands = new Collection();
