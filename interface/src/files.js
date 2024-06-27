@@ -16,10 +16,12 @@ class SoundInfo {
 }
 
 function init() {
-	fs.readFile(dbFile, (err, data) => {
-		if(err) console.error(`Failed to read DB file: ${err}`);
-		else db = new Map(JSON.parse(data));
-	})
+	try {
+		const data = fs.readFileSync(dbFile);
+		db = new Map(JSON.parse(data));
+	} catch(err) {
+		console.error(`Failed to read DB file: ${err}`);
+	}
 }
 function writeDB() {
 	fs.writeFile(dbFile,
@@ -34,7 +36,10 @@ function writeSound(name, buf) {
 	return p;
 }
 function registerSound(info, id = null) {
+	console.log(Array.from(db.entries()))
+	console.log(`adding ${info.path}`)
 	if(id == null) id = db.size;
+	console.log(Array.from(db.entries()))
 
 	db.set(id, info);
 	writeDB();

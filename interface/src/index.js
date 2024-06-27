@@ -23,12 +23,6 @@ app.get("/", (_, res) => {
 	res.sendFile(path.join(fep,"index.html"))
 });
 
-app.get('/web', (req, res) => {
-	res.sendFile(
-		path.join(fep, req.path),
-		(err) => console.log(`Couldn't send file: ${err}`));
-});
-
 io.on('connection', (socket) => {
 	console.log(`new client: ${socket.id}`);
 	socket.on('disconnect', () => console.log('client disconnected'));
@@ -44,8 +38,8 @@ io.on('connection', (socket) => {
 
 	socket.on('upload', (name, file) => {
 		console.log(`received ${name}`)
-		const path = files.writeSound(name, file);
-		files.registerSound(new files.SoundInfo(path, 'the uploaderrrr'));
+		files.writeSound(name, file);
+		files.registerSound(new files.SoundInfo(name, 'the uploaderrrr'));
 	});
 	socket.on('play', (soundId) => {
 		// TODO
@@ -72,7 +66,5 @@ app.use('/sounds', (req, res) => {
 
 server.listen(port, () => {
 	files.init();
-	files.registerSound(new files.SoundInfo("test.mp3", "dod"))
-	files.registerSound(new files.SoundInfo("test2.mp3", "malice"))
 	console.log(`Server listening on ${port}`)
 })
