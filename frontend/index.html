@@ -12,6 +12,17 @@ button {
 		<p>hola mundo</p>
 		<script src="./index.js"></script>
 		<input type=url id="iuServerUrl" label="server URL" value="localhost:9410"></input>
+		<button onclick="updateUrl()">update</button>
+		<p id="pCurrentUrl">URL not set.</p>
+
+		<hr>
 		<button onclick="test()">test</button>
+		<hr>
+
+		<input type=file id="ifUpload"></input>
+		<button onclick="upload()">upload</button>
+
+		<div id="dSoundList">
+		</div>
 	</body>
 </html>
