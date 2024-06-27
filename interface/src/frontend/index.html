@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>SoundBard console</title>
+		<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+		<!--<script src="/web/index.js">-->
+		<style>
+button {
+	padding: 1em;
+}
+		</style>
+	</head>
+	<body>
+		<p>hola mundo</p>
+
+		<button onclick="test()">test</button>
+		<hr>
+
+		<!--<form id="fUpload" action="/upload" method="post" enctype="multipart/form-data">-->
+		<input type=file accept=audio/* name="sound" id="ifUpload" />
+		<button onclick="upload()">upload</button>
+
+		<div id="dSoundList">
+		</div>
+
+		<script>
+			const socket = io();
+
+			function upload() {
+				const files = document.getElementById("ifUpload").files;
+				if(!files || files.length != 1) {
+					alert("select exactly 1 file.");
+					return;
+				}
+				socket.emit('upload', files[0].name, files[0]);
+			}
+			function test() {
+				socket.emit('test');
+			}
+		</script>
+	</body>
+</html>

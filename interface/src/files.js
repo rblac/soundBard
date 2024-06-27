@@ -27,6 +27,12 @@ function writeDB() {
 		(err) => { if(err) throw err; });
 }
 
+function writeSound(name, buf) {
+	const p = path.join(rootDir, name);
+	fs.writeFile(p, buf,
+		(err) => { if(err) console.error(`failed to write sound '${name}': ${err}`) });
+	return p;
+}
 function registerSound(info, id = null) {
 	if(id == null) id = db.size;
 
@@ -46,6 +52,7 @@ function getSoundPath(id) {
 module.exports = {
 	SoundInfo,
 	init,
+	writeSound,
 	registerSound,
 	listSounds,
 	getSoundPath,
