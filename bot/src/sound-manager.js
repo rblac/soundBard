@@ -5,6 +5,7 @@ var currentChannel = null
 module.exports = {
 	play: function(audioRes) {
 		const conn = getVoiceConnection(currentChannel.guild.id);
+		conn.dispatchAudio();
 		const ap = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Play } });
 		ap.play(audioRes);
 		conn.subscribe(ap);

@@ -26,6 +26,27 @@ button {
 		<script>
 			const socket = io();
 
+			socket.on('list-data', (data) => {
+				const dl = document.getElementById("dSoundList");
+				const createRow = (s) => {
+					return `<tr><th scope="row">${s.path}</td><td>${s.author}</td><td><button onclick="playSound('${s.path}')">PLAY</button></td></tr>`
+				};
+
+				var b = "<table><tbody>";
+				data.forEach((s) => b += createRow(s));
+				b += "</tbody></table>";
+
+				dl.innerHTML = b;
+			})
+
+			function playSound(filename) {
+				socket.emit('play', filename);
+			}
+			function setupList() {
+				socket.emit('list', 'placeholder')
+			}
+			setupList();
+
 			function upload() {
 				const files = document.getElementById("ifUpload").files;
 				if(!files || files.length != 1) {

@@ -30,10 +30,17 @@ function writeDB() {
 }
 
 function writeSound(name, buf) {
-	const p = path.join(rootDir, name);
+	var p = path.join(rootDir, name);
+	var fileName = name;
+	let i = 0;
+	do {
+		fileName = `name-${++i}`;
+		p = path.join(rootDir, fileName);
+	}
+	while(fs.existsSync(p)) 
 	fs.writeFile(p, buf,
 		(err) => { if(err) console.error(`failed to write sound '${name}': ${err}`) });
-	return p;
+	return fileName;
 }
 function registerSound(info, id = null) {
 	console.log(Array.from(db.entries()))

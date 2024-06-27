@@ -23,6 +23,13 @@ app.get("/", (_, res) => {
 	res.sendFile(path.join(fep,"index.html"))
 });
 
+
+function createPlayCommand(soundUrl) {
+	return {
+		type: 'play',
+		soundUrl: soundUrl
+	}
+}
 io.on('connection', (socket) => {
 	console.log(`new client: ${socket.id}`);
 	socket.on('disconnect', () => console.log('client disconnected'));
@@ -33,27 +40,23 @@ io.on('connection', (socket) => {
 			body: JSON.stringify(createPlayCommand(`${selfUrl}:${port}/sounds/test2.mp3`))
 		}))
 			.catch((reason) => console.error(`Failed to send test request: ${reason}`))
-		console.log(`sending req to ${botUrl}`)
 	});
 
 	socket.on('upload', (name, file) => {
 		console.log(`received ${name}`)
-		files.writeSound(name, file);
-		files.registerSound(new files.SoundInfo(name, 'the uploaderrrr'));
+		const fileName = files.writeSound(name, file);
+		files.registerSound(new files.SoundInfo(fileName, 'the uploaderrrr'));
 	});
-	socket.on('play', (soundId) => {
-		// TODO
+	socket.on('play', (filename) => {
+		fetch(new Request(botUrl, {
+			method: 'POST',
+			body: JSON.stringify(createPlayCommand(`${selfUrl}:${port}/sounds/${filename}`))
+		}))
+			.catch((reason) => console.error(`Failed to send test request: ${reason}`))
 	});
 
-	socket.on('list', (_user) => socket.emit(files.listSounds()));
+	socket.on('list', (_user) => socket.emit('list-data', files.listSounds()));
 })
-
-function createPlayCommand(soundUrl) {
-	return {
-		type: 'play',
-		soundUrl: soundUrl
-	}
-}
 
 const rootPath = path.join(__dirname, filesRoot);
 const upload = multer({ dest: rootPath })
@@ -61,7 +64,8 @@ const upload = multer({ dest: rootPath })
 app.use('/sounds', (req, res) => {
 	res.sendFile(
 		path.join(rootPath, req.path),
-		(err) => console.log(`Couldn't send file: ${err}`));
+		(err) => { if(err) console.log(`Couldn't send file: ${err}`) }
+	);
 });
 
 server.listen(port, () => {
