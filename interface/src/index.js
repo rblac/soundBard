@@ -1,7 +1,6 @@
 const http = require('node:http')
 const express = require('express')
 const path = require('node:path')
-const multer = require('multer');
 const { Server } = require('socket.io')
 
 const { port, botUrl, selfUrl, filesRoot, frontendRoot } = require('../config.json');
@@ -32,6 +31,10 @@ function createPlayCommand(soundUrl) {
 }
 io.on('connection', (socket) => {
 	console.log(`new client: ${socket.id}`);
+
+	socket.emit('list-data', files.listSounds());
+	socket.on('list', (_user) => socket.emit('list-data', files.listSounds()));
+
 	socket.on('disconnect', () => console.log('client disconnected'));
 
 	socket.on('test', () => {
@@ -44,8 +47,14 @@ io.on('connection', (socket) => {
 
 	socket.on('upload', (name, file) => {
 		console.log(`received ${name}`)
-		const fileName = files.writeSound(name, file);
-		files.registerSound(new files.SoundInfo(fileName, 'the uploaderrrr'));
+		try {
+			const fileName = files.writeSound(name, file);
+			const soundInfo = new files.SoundInfo(fileName, 'the uploaderrrr');
+			files.registerSound(soundInfo)
+			io.emit('new-sound', soundInfo);
+		} catch(e) {
+			console.error(`failed to initialise new sound: ${e}`);
+		}
 	});
 	socket.on('play', (filename) => {
 		fetch(new Request(botUrl, {
@@ -54,17 +63,21 @@ io.on('connection', (socket) => {
 		}))
 			.catch((reason) => console.error(`Failed to send test request: ${reason}`))
 	});
-
-	socket.on('list', (_user) => socket.emit('list-data', files.listSounds()));
+	socket.on('delete', (filename) => {
+		if(files.eraseSound(filename))
+			io.emit('del-sound', filename);
+	})
 })
 
 const rootPath = path.join(__dirname, filesRoot);
-const upload = multer({ dest: rootPath })
 
 app.use('/sounds', (req, res) => {
 	res.sendFile(
 		path.join(rootPath, req.path),
-		(err) => { if(err) console.log(`Couldn't send file: ${err}`) }
+		(err) => {
+			if(err && err != 'Request aborted')
+				console.log(`Couldn't send file: ${err}`)
+		}
 	);
 });
 

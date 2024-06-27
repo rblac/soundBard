@@ -34,7 +34,7 @@ function writeSound(name, buf) {
 	var fileName = name;
 	let i = 0;
 	do {
-		fileName = `name-${++i}`;
+		fileName = name+(++i).toString();
 		p = path.join(rootDir, fileName);
 	}
 	while(fs.existsSync(p)) 
@@ -43,22 +43,32 @@ function writeSound(name, buf) {
 	return fileName;
 }
 function registerSound(info, id = null) {
-	console.log(Array.from(db.entries()))
-	console.log(`adding ${info.path}`)
 	if(id == null) id = db.size;
-	console.log(Array.from(db.entries()))
+	if(info == null) {
+		console.error("attempting to write null sound");
+		return;
+	}
 
 	db.set(id, info);
 	writeDB();
 
 	return id;
 }
+function eraseSound(filename, _user) {
+	try {
+		const p = path.join(rootDir, filename);
+		fs.rmSync(p);
+		db.delete(filename);
+		writeDB();
+		return true;
+	} catch(e) {
+		console.error(`failed to erase sound: ${e}`);
+		return false;
+	}
+}
 function listSounds(user) {
 	// no user auth for now
 	return Array.from(db.values());
-}
-function getSoundPath(id) {
-	return db[id].path
 }
 
 module.exports = {
@@ -66,6 +76,6 @@ module.exports = {
 	init,
 	writeSound,
 	registerSound,
+	eraseSound,
 	listSounds,
-	getSoundPath,
 }

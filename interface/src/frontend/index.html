@@ -26,21 +26,39 @@ button {
 		<script>
 			const socket = io();
 
+			const createRow = (s) => {
+				return `<tr id="tr-${s.path}"><th scope="row">${s.path}</td><td>${s.author}</td><td><button onclick="playSound('${s.path}')">PLAY</button><button onclick="deleteSound('${s.path}')">X</button></td></tr>`
+			};
+			function htmlToDOM(html) {
+				var temp = document.createElement('template');
+				temp.innerHTML = html.trim();
+				return temp.content.firstChild;
+			}
+
 			socket.on('list-data', (data) => {
 				const dl = document.getElementById("dSoundList");
-				const createRow = (s) => {
-					return `<tr><th scope="row">${s.path}</td><td>${s.author}</td><td><button onclick="playSound('${s.path}')">PLAY</button></td></tr>`
-				};
 
-				var b = "<table><tbody>";
+				var b = '<table id="tSounds"><tbody>';
 				data.forEach((s) => b += createRow(s));
 				b += "</tbody></table>";
 
 				dl.innerHTML = b;
 			})
+			socket.on('new-sound', (s) => {
+				const tb = document.getElementById("tSounds").getElementsByTagName('tbody')[0];
+				const newRow = htmlToDOM(createRow(s), 'text/html');
+				tb.appendChild(newRow);
+			})
+			socket.on('del-sound', (name) => {
+				const tb = document.getElementById("tSounds").getElementsByTagName('tbody')[0];
+				tb.removeChild(document.getElementById(`tr-${name}`));
+			});
 
 			function playSound(filename) {
 				socket.emit('play', filename);
+			}
+			function deleteSound(filename) {
+				socket.emit('delete', filename);
 			}
 			function setupList() {
 				socket.emit('list', 'placeholder')
