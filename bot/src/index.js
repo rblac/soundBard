@@ -3,7 +3,7 @@ const { token, listenPort } = require('../config.json');
 
 const http = require('node:http')
 
-const { loadCommands } = require('./commands.js')
+const commands = require('./commands.js')
 const { handleRequest } = require('./request-handler.js')
 
 // Create a new client instance
@@ -11,10 +11,11 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 
 // Init commands
 client.commands = new Collection();
-loadCommands().forEach(command => {
+commands.loadCommands().forEach(command => {
 	console.log(`registered command ${command.data.name}`)
 	client.commands.set(command.data.name, command);
 })
+commands.deployCommands();
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
