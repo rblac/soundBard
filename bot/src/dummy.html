@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+	<title>dummy bot</title>
+</head>
+<body>
+	<h2>this is a dummy bot / playback endpoint instance.</h2>
+	<h3>please initialise an actual bot instance after filling in the aproppriate credentials in <code>config.json</code></h3>
+	<p id="log"></p>
+	<script>
+		setInterval(() => {
+			fetch('/queued')
+				.then((data) => data.json()
+					.then((urls) => {
+						urls.forEach((url) => {
+							console.log(url)
+							document.getElementById('log').innerText += `queued playback: ${url}\n`;
+							const a = new Audio(url);
+							a.play();
+						})
+					}))
+			},
+			100
+		)
+	</script>
+</body>
+</html>

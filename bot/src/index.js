@@ -1,5 +1,3 @@
-'use strict';
-
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token, listenPort } = require('../config.json');
 
