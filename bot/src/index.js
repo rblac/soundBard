@@ -1,5 +1,8 @@
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { token, listenPort } = require('../config.json');
+const { listenPort } = require('../config.json');
+const { env } = require('node:process')
+
+const token = env.BOT_TOKEN;
 
 const http = require('node:http')
 

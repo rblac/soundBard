@@ -1,7 +1,10 @@
 const { REST, Routes } = require('discord.js')
-const { token, clientId } = require('../config.json')
 const fs = require('node:fs')
 const path = require('node:path')
+const { env } = require('node:process')
+
+const token = env.BOT_TOKEN;
+const clientId = env.BOT_CLIENTID
 
 module.exports = {
 	loadCommands: function() {

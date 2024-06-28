@@ -3,7 +3,6 @@ const { getVoiceConnection, createAudioResource, createAudioPlayer, NoSubscriber
 const { testSound } = require('../../config.json')
 const SM = require('../sound-manager.js')
 
-
 module.exports = {
 	data:
 		new SlashCommandBuilder()

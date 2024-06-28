@@ -1,0 +1,6 @@
+{
+  "testSound": "../test.mp3",
+  "listenPort": 50227,
+  "serverUrl": "https://localhost",
+  "dummyPort": 9411
+}
