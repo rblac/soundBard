@@ -13,9 +13,13 @@ button {
 	<body>
 		<p>hola mundo</p>
 
+		<p><span id="sStatus">not connected</span></p>
+
 		<button onclick="test()">test</button>
 		<hr>
-
+		User: <input id="itTestUser" />
+		<button onclick="updateUser()">update</button>
+		<hr>
 		<!--<form id="fUpload" action="/upload" method="post" enctype="multipart/form-data">-->
 		<input type=file accept=audio/* name="sound" id="ifUpload" />
 		<button onclick="upload()">upload</button>
@@ -27,7 +31,13 @@ button {
 			const socket = io();
 
 			const createRow = (s) => {
-				return `<tr id="tr-${s.path}"><th scope="row">${s.path}</td><td>${s.author}</td><td><button onclick="playSound('${s.path}')">PLAY</button><button onclick="deleteSound('${s.path}')">X</button></td></tr>`
+				return `<tr id="tr-${s.id}"><th scope="row">${s.path}</td><td>${s.author}</td>` +
+						`<td><button onclick="playSound(${s.id})">PLAY</button></td>` +
+						`<td><button onclick="deleteSound(${s.id})">X</button></td>` +
+						`<td><input type="checkbox" ${s.canManage?'enabled':'disabled'} `+
+							`id="cbVis-${s.id}" ${s.communal?'checked':'unchecked'} `+
+							`onchange="changeVis(${s.id}, this)" /></td>` +
+						`</tr>`
 			};
 			function htmlToDOM(html) {
 				var temp = document.createElement('template');
@@ -38,7 +48,15 @@ button {
 			socket.on('list-data', (data) => {
 				const dl = document.getElementById("dSoundList");
 
-				var b = '<table id="tSounds"><tbody>';
+				var b = '<table id="tSounds">'+
+						'<thead> <tr>'+
+							'<th scope="col">name</th>'+
+							'<th scope="col">author</th>'+
+							'<th scope="col">play</th>'+
+							'<th scope="col">delete</th>'+
+							'<th scope="col">public</th>'+
+						'</tr></thead>'+
+						'<tbody>';
 				data.forEach((s) => b += createRow(s));
 				b += "</tbody></table>";
 
@@ -46,22 +64,41 @@ button {
 			})
 			socket.on('new-sound', (s) => {
 				const tb = document.getElementById("tSounds").getElementsByTagName('tbody')[0];
-				const newRow = htmlToDOM(createRow(s), 'text/html');
+				const newRow = htmlToDOM(createRow(s));
 				tb.appendChild(newRow);
 			})
-			socket.on('del-sound', (name) => {
+			socket.on('del-sound', (id) => {
 				const tb = document.getElementById("tSounds").getElementsByTagName('tbody')[0];
-				tb.removeChild(document.getElementById(`tr-${name}`));
+				tb.removeChild(document.getElementById(`tr-${id}`));
+			});
+			socket.on('vis', (id, vis) => {
+				console.log(vis)
+				//document.getElementById(`cbVis-${id}`).checked = vis;
 			});
 
-			function playSound(filename) {
-				socket.emit('play', filename);
+			socket.on('ack-user', (username) => {
+				document.getElementById("sStatus").innerText = `connected as ${username}`;
+			});
+
+			function updateUser() {
+				const un = document.getElementById("itTestUser").value;
+				socket.emit('set-user', un);
 			}
-			function deleteSound(filename) {
-				socket.emit('delete', filename);
+			if(document.getElementById("itTestUser").value)
+				updateUser();
+
+			function playSound(id) {
+				socket.emit('play', id);
+			}
+			function deleteSound(id) {
+				socket.emit('delete', id);
+			}
+			function changeVis(id, toggle) {
+				const isPublic = toggle.checked;
+				socket.emit('set-vis', id, isPublic)
 			}
 			function setupList() {
-				socket.emit('list', 'placeholder')
+				socket.emit('list')
 			}
 			setupList();
 

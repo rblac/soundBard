@@ -29,13 +29,33 @@ function createPlayCommand(soundUrl) {
 		soundUrl: soundUrl
 	}
 }
+
+var clients = new Map();
 io.on('connection', (socket) => {
 	console.log(`new client: ${socket.id}`);
+	var username = "guest"+socket.id;
+	clients.set(socket.id, username);
+	socket.emit('list-data', files.listSounds(username));
 
-	socket.emit('list-data', files.listSounds());
-	socket.on('list', (_user) => socket.emit('list-data', files.listSounds()));
+	socket.on('set-user', (newUsername) => {
+		// username already in use
+		if(Array.from(clients.values()).includes(newUsername) && newUsername != username) {
+			console.err(`Username ${newUsername} already taken.`)
+			socket.emit('user-taken', newUsername);
+			return;
+		}
+		username = newUsername;
+		clients.set(socket.id, username);
+		socket.emit('ack-user', username)
+		socket.emit('list-data', files.listSounds(username));
+	});
 
-	socket.on('disconnect', () => console.log('client disconnected'));
+	socket.on('list', () => socket.emit('list-data', files.listSounds(username)));
+
+	socket.on('disconnect', () => {
+		clients.delete(socket.id);
+		console.log(`client disconnected: ${username}`);
+	});
 
 	socket.on('test', () => {
 		fetch(new Request(botUrl, {
@@ -49,23 +69,29 @@ io.on('connection', (socket) => {
 		console.log(`received ${name}`)
 		try {
 			const fileName = files.writeSound(name, file);
-			const soundInfo = new files.SoundInfo(fileName, 'the uploaderrrr');
+			const soundInfo = new files.SoundInfo(fileName, username);
 			files.registerSound(soundInfo)
 			io.emit('new-sound', soundInfo);
 		} catch(e) {
 			console.error(`failed to initialise new sound: ${e}`);
 		}
 	});
-	socket.on('play', (filename) => {
+	socket.on('play', (id) => {
+		const filename = files.getSoundFilename(id);
 		fetch(new Request(botUrl, {
 			method: 'POST',
 			body: JSON.stringify(createPlayCommand(`${selfUrl}:${port}/sounds/${filename}`))
 		}))
 			.catch((reason) => console.error(`Failed to send test request: ${reason}`))
 	});
-	socket.on('delete', (filename) => {
-		if(files.eraseSound(filename))
-			io.emit('del-sound', filename);
+	socket.on('delete', (id) => {
+		if(files.eraseSound(username, id))
+			io.emit('del-sound', id);
+	})
+	socket.on('set-vis', (id, isPublic) => {
+		if(files.setSoundVis(username, id, isPublic)) {
+			io.emit('vis', id, isPublic);
+		}
 	})
 })
 
