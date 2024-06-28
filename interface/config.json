@@ -1,0 +1,8 @@
+{
+  "port": 9410,
+  "botUrl": "http://localhost:50227",
+  "selfUrl": "http://localhost",
+  "filesRoot": "../sounds/",
+  "frontendRoot": "./frontend/",
+  "configRoot": "../"
+}
