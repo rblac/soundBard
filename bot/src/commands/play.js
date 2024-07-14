@@ -14,6 +14,7 @@ module.exports = {
 			),
 	async execute(interaction) {
 		// classic injection vuln waiting to happen :)
+		const link = interaction.options.getString("link");
 		const ar = createAudioResource(link)
 		SM.play(ar);
 		await interaction.reply(`playing ${link}`);
