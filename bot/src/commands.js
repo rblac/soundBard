@@ -6,6 +6,9 @@ const { env } = require('node:process')
 const token = env.BOT_TOKEN;
 const clientId = env.BOT_CLIENTID
 
+console.log(`Using token ${token}`)
+console.log(`Using clientId ${clientId}`)
+
 module.exports = {
 	loadCommands: function() {
 		const commands = [];
