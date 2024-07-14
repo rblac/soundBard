@@ -7,6 +7,10 @@ const path = require('node:path')
 var db = new Map();
 const rootDir = path.join(__dirname, filesRoot);
 const rootDirConf = path.join(__dirname, configRoot);
+
+if(!fs.existsSync(rootDir)) fs.mkdirSync(rootDir);
+if(!fs.existsSync(configRoot)) fs.mkdirSync(configRoot);
+
 var dbFile = path.join(rootDirConf, "db-sounds.json");
 var userFile = path.join(rootDirConf, "users.json");
 var users = { admins: [] };
