@@ -5,20 +5,37 @@
 		<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 		<!--<script src="/web/index.js">-->
 		<style>
+body {
+	font-family: sans-serif;
+	background: #223;
+	color: #eee;
+}
+div {
+	padding: 1em;
+}
 button {
 	padding: 1em;
+	font-weight: bold;
+	background: #334;
+	color: #eee;
+	border-radius: 0.3em;
+	border-color: #557;
+}
+input {
+	background: #223;
+	color: #eee;
+	font-size: 100%;
 }
 		</style>
 	</head>
 	<body>
-		<p>hola mundo</p>
+		<h1>SoundBard web interface</h1>
 
-		<p><span id="sStatus">not connected</span></p>
-
-		<button onclick="test()">test</button>
+		<!--<button onclick="test()">test</button>-->
 		<hr>
+		<p><span id="sStatus">not connected</span></p>
 		User: <input id="itTestUser" />
-		<button onclick="updateUser()">update</button>
+		<button onclick="updateUser()">connect</button>
 		<hr>
 		<!--<form id="fUpload" action="/upload" method="post" enctype="multipart/form-data">-->
 		<input type=file accept=audio/* name="sound" id="ifUpload" />

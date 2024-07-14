@@ -2,7 +2,5 @@
   "name": "SoundBard",
   "version": "1.0.0",
   "workspaces": ["interface", "bot"],
-  "author": "Roch Błachut",
-  "license": "ISC",
-  "description": ""
+  "author": "Roch Błachut"
 }
